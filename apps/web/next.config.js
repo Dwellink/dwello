@@ -10,6 +10,11 @@ configureRuntimeEnv();
 
 /** @type {import("next").NextConfig} */
 const config = {
+  // Mount Kan under /dwello so dwellink.co can reverse-proxy to it without
+  // path rewriting. All of Kan's internal URLs (router links, _next/static
+  // assets, API routes, Better Auth handler) are emitted with this prefix.
+  basePath: "/dwello",
+  assetPrefix: "/dwello",
   output:
     env("NEXT_PUBLIC_USE_STANDALONE_OUTPUT") === "true"
       ? "standalone"

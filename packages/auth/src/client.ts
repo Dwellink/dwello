@@ -26,7 +26,12 @@ const socialProvidersPluginClient = {
   },
 } satisfies BetterAuthClientPlugin;
 
+// Kan is mounted at /dwello behind Dwellink's proxy. Fetches from the
+// browser are origin-absolute, so without this prefix authClient would
+// call /api/auth/* (Dwellink's own NextAuth handler) instead of
+// /dwello/api/auth/* (Kan's own handler).
 export const authClient = createAuthClient({
+  baseURL: "/dwello",
   plugins: [
     stripeClient({
       subscription: true,

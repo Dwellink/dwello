@@ -12,6 +12,10 @@
     "./server": {
       "types": "./src/server.ts",
       "default": "./src/server.ts"
+    },
+    "./dwellink-bridge": {
+      "types": "./src/dwellink-bridge.ts",
+      "default": "./src/dwellink-bridge.ts"
     }
   },
   "license": "GPL-3.0",

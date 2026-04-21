@@ -15,6 +15,10 @@ export const env = createEnv({
    */
   server: {
     KAN_ADMIN_API_KEY: z.string().optional(),
+    // Shared secret for HMAC-signed identity headers forwarded by the
+    // Dwellink reverse proxy. Must match DWELLO_BRIDGE_SECRET on the
+    // Dwellink side.
+    DWELLO_BRIDGE_SECRET: z.string(),
     BETTER_AUTH_SECRET: z.string(),
     BETTER_AUTH_TRUSTED_ORIGINS: z
       .string()

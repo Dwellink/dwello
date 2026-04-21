@@ -9,6 +9,7 @@ import { ZodError } from "zod";
 
 import type { dbClient } from "@kan/db/client";
 import { initAuth } from "@kan/auth/server";
+import { getSessionFromBridgeHeaders } from "@kan/auth/dwellink-bridge";
 import { createDrizzleClient } from "@kan/db/client";
 import { createLogger } from "@kan/logger";
 
@@ -92,7 +93,7 @@ export const createTRPCContext = async ({ req }: CreateNextContextOptions) => {
   const headers = new Headers(req.headers as Record<string, string>);
   const auth = createAuthWithHeaders(baseAuth, headers);
 
-  const session = await auth.api.getSession();
+  const session = await getSessionFromBridgeHeaders(db, headers);
 
   return createInnerTRPCContext({
     db,
@@ -109,7 +110,7 @@ export const createNextApiContext = async (req: NextApiRequest) => {
   const headers = new Headers(req.headers as Record<string, string>);
   const auth = createAuthWithHeaders(baseAuth, headers);
 
-  const session = await auth.api.getSession();
+  const session = await getSessionFromBridgeHeaders(db, headers);
 
   return createInnerTRPCContext({
     db,
@@ -128,7 +129,7 @@ export const createRESTContext = async ({ req }: CreateNextContextOptions) => {
 
   let session;
   try {
-    session = await auth.api.getSession();
+    session = await getSessionFromBridgeHeaders(db, headers);
   } catch (error) {
     log.warn({ err: error }, "Failed to get session, treating as unauthenticated");
   }
