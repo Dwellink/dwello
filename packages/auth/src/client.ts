@@ -40,13 +40,20 @@ const socialProvidersPluginClient = {
 // On the server (SSR / build), fall back to the env var. Better Auth
 // validates baseURL with new URL() so we always need an absolute URL.
 //
+// IMPORTANT: append /api/auth ourselves. Better Auth's withPath() helper
+// only adds /api/auth when the baseURL has no path — so once we include
+// /dwello (Next basePath), withPath silently returns the URL unchanged
+// and requests land at /dwello/get-session (caught by [workspaceSlug])
+// instead of /dwello/api/auth/get-session.
+//
 // globalThis cast avoids needing DOM in @kan/auth's tsconfig lib.
 const browserOrigin = (
   globalThis as { location?: { origin: string } }
 ).location?.origin;
-const baseURL = browserOrigin
+const root = browserOrigin
   ? `${browserOrigin}/dwello`
   : process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000/dwello";
+const baseURL = `${root.replace(/\/+$/, "")}/api/auth`;
 
 export const authClient = createAuthClient({
   baseURL,

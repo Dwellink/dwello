@@ -24,15 +24,7 @@ export default function LoginPage() {
     setMagicLinkRecipient(recipient);
   };
 
-  const sessionResult = authClient.useSession();
-  const data = sessionResult.data;
-
-  // Debug: surface what useSession actually returns. Remove once /dwello
-  // bridge flow is verified end-to-end.
-  if (typeof globalThis !== "undefined" && "console" in globalThis) {
-    // eslint-disable-next-line no-console
-    (globalThis as { console: Console }).console.log("[dwello debug] useSession", sessionResult);
-  }
+  const { data } = authClient.useSession();
 
   if (data?.user?.id) router.push("/boards");
 
