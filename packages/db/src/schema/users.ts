@@ -1,11 +1,11 @@
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
-  pgTable,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { pgTable } from "./_table";
 
 import { apikey } from "./auth";
 import { boards, userBoardFavorites } from "./boards";

@@ -2,11 +2,11 @@ import { relations } from "drizzle-orm";
 import {
   bigint,
   bigserial,
-  pgTable,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { pgTable } from "./_table";
 
 import { boards } from "./boards";
 import { cardsToLabels } from "./cards";

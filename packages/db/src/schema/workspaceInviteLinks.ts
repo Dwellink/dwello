@@ -1,12 +1,11 @@
 import {
   bigint,
   bigserial,
-  pgEnum,
-  pgTable,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable } from "./_table";
 
 import { users } from "./users";
 import { workspaces } from "./workspaces";

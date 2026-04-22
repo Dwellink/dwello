@@ -3,10 +3,10 @@ import {
   bigserial,
   boolean,
   integer,
-  pgTable,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import { pgTable } from "./_table";
 
 import { workspaces } from "./workspaces";
 

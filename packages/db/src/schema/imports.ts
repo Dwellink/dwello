@@ -1,12 +1,11 @@
 import { relations } from "drizzle-orm";
 import {
   bigserial,
-  pgEnum,
-  pgTable,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable } from "./_table";
 
 import { boards } from "./boards";
 import { cards } from "./cards";

@@ -3,8 +3,6 @@ import {
   bigint,
   bigserial,
   index,
-  pgEnum,
-  pgTable,
   primaryKey,
   text,
   timestamp,
@@ -13,6 +11,7 @@ import {
   varchar,
   boolean,
 } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable } from "./_table";
 import { imports } from "./imports";
 import { labels } from "./labels";
 import { lists } from "./lists";

@@ -4,12 +4,12 @@ import {
   bigserial,
   boolean,
   index,
-  pgTable,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { pgTable } from "./_table";
 
 import { users } from "./users";
 import { workspaces } from "./workspaces";

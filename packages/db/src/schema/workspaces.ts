@@ -4,13 +4,12 @@ import {
   bigserial,
   boolean,
   integer,
-  pgEnum,
-  pgTable,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable } from "./_table";
 
 import { boards } from "./boards";
 import { workspaceMemberPermissions, workspaceRoles } from "./permissions";

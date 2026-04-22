@@ -3,11 +3,11 @@ import {
   bigint,
   bigserial,
   integer,
-  pgTable,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { pgTable } from "./_table";
 
 import { boards } from "./boards";
 import { cards } from "./cards";

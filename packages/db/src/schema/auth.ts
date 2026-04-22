@@ -3,11 +3,11 @@ import {
   bigserial,
   boolean,
   integer,
-  pgTable,
   text,
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
+import { pgTable } from "./_table";
 
 import { users } from "./users";
 

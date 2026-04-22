@@ -3,13 +3,12 @@ import {
   bigint,
   bigserial,
   index,
-  pgEnum,
-  pgTable,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable } from "./_table";
 
 import { cards } from "./cards";
 import { comments } from "./cards";

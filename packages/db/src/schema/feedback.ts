@@ -2,11 +2,11 @@ import { relations } from "drizzle-orm";
 import {
   bigserial,
   boolean,
-  pgTable,
   text,
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
+import { pgTable } from "./_table";
 
 import { users } from "./users";
 

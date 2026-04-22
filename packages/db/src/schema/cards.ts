@@ -3,14 +3,13 @@ import {
   bigint,
   bigserial,
   integer,
-  pgEnum,
-  pgTable,
   primaryKey,
   text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable } from "./_table";
 
 import { boards } from "./boards";
 import { checklists } from "./checklists";

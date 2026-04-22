@@ -5,11 +5,11 @@ import {
   boolean,
   index,
   integer,
-  pgTable,
   timestamp,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
+import { pgTable } from "./_table";
 
 import { workspaces } from "./workspaces";
 
