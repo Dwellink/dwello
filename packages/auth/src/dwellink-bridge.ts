@@ -88,6 +88,22 @@ export interface BridgeSession {
  * valid admins always carry valid headers because they came through
  * Dwellink's proxy.
  */
+export type BridgeDebug = {
+  reason:
+    | "missing-header"
+    | "missing-secret"
+    | "bad-timestamp"
+    | "expired"
+    | "hmac-mismatch"
+    | "upsert-failed";
+  details?: Record<string, unknown>;
+};
+
+let lastFailure: BridgeDebug | null = null;
+export function getLastBridgeFailure(): BridgeDebug | null {
+  return lastFailure;
+}
+
 export async function getSessionFromBridgeHeaders(
   db: dbClient,
   headers: Headers,
@@ -99,17 +115,51 @@ export async function getSessionFromBridgeHeaders(
   const sig = headers.get("x-dwellink-sig");
   const secret = process.env.DWELLO_BRIDGE_SECRET;
 
-  if (!dwellinkUserId || !email || !ts || !sig || !secret) return null;
+  if (!dwellinkUserId || !email || !ts || !sig) {
+    lastFailure = {
+      reason: "missing-header",
+      details: {
+        hasUserId: !!dwellinkUserId,
+        hasEmail: !!email,
+        hasTs: !!ts,
+        hasSig: !!sig,
+      },
+    };
+    return null;
+  }
+  if (!secret) {
+    lastFailure = { reason: "missing-secret" };
+    return null;
+  }
 
   const tsNum = Number(ts);
-  if (!Number.isFinite(tsNum)) return null;
-  if (Math.abs(Date.now() - tsNum) > MAX_SKEW_MS) return null;
+  if (!Number.isFinite(tsNum)) {
+    lastFailure = { reason: "bad-timestamp", details: { ts } };
+    return null;
+  }
+  const skewMs = Date.now() - tsNum;
+  if (Math.abs(skewMs) > MAX_SKEW_MS) {
+    lastFailure = { reason: "expired", details: { skewMs } };
+    return null;
+  }
 
   const expected = await hmacSha256Hex(
     `${dwellinkUserId}|${email}|${ts}`,
     secret,
   );
-  if (!timingSafeEqualHex(expected, sig)) return null;
+  if (!timingSafeEqualHex(expected, sig)) {
+    lastFailure = {
+      reason: "hmac-mismatch",
+      details: {
+        // Reveals only the first 8 chars of each so we can confirm the
+        // signing inputs match without leaking the full secret-derived sigs.
+        expectedPrefix: expected.slice(0, 8),
+        receivedPrefix: sig.slice(0, 8),
+        secretLength: secret.length,
+      },
+    };
+    return null;
+  }
 
   const kanUserId = dwellinkIdToKanUuid(dwellinkUserId);
   const now = new Date();
@@ -135,7 +185,11 @@ export async function getSessionFromBridgeHeaders(
       })
       .returning();
 
-    if (!row) return null;
+    if (!row) {
+      lastFailure = { reason: "upsert-failed", details: { kanUserId } };
+      return null;
+    }
+    lastFailure = null;
 
     return {
       user: {
@@ -149,7 +203,11 @@ export async function getSessionFromBridgeHeaders(
         stripeCustomerId: row.stripeCustomerId ?? null,
       },
     };
-  } catch {
+  } catch (err) {
+    lastFailure = {
+      reason: "upsert-failed",
+      details: { error: (err as Error).message },
+    };
     return null;
   }
 }

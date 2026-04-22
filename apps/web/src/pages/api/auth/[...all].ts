@@ -1,7 +1,10 @@
 import { toNodeHandler } from "better-auth/node";
 
 import { initAuth } from "@kan/auth/server";
-import { getSessionFromBridgeHeaders } from "@kan/auth/dwellink-bridge";
+import {
+  getLastBridgeFailure,
+  getSessionFromBridgeHeaders,
+} from "@kan/auth/dwellink-bridge";
 import { createDrizzleClient } from "@kan/db/client";
 import { withRateLimit } from "@kan/api/utils/rateLimit";
 
@@ -35,7 +38,15 @@ export default withRateLimit(
       const bridgeSession = await getSessionFromBridgeHeaders(db, headers);
       res.setHeader("content-type", "application/json");
       if (!bridgeSession) {
-        res.status(200).end("null");
+        // Debug payload is admin-gated by Dwellink's middleware before
+        // reaching this handler — safe to expose. Frontend useSession()
+        // ignores any extra fields beyond null/{user,session}.
+        const failure = getLastBridgeFailure();
+        if (failure && req.query.debug === "1") {
+          res.status(200).end(JSON.stringify({ session: null, _debug: failure }));
+        } else {
+          res.status(200).end("null");
+        }
         return;
       }
       const now = new Date();
