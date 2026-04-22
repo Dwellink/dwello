@@ -5,7 +5,11 @@ import { env } from "next-runtime-env";
 export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === "/") {
     if (env("NEXT_PUBLIC_KAN_ENV") !== "cloud") {
-      const loginUrl = new URL("/login", request.url);
+      // Clone preserves basePath (/dwello), unlike new URL("/login", request.url)
+      // which resolves against the origin and strips basePath, causing the
+      // browser to land on dwellink.co/login (404).
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/login";
       return NextResponse.redirect(loginUrl);
     }
   }
