@@ -39,10 +39,14 @@ const socialProvidersPluginClient = {
 //
 // On the server (SSR / build), fall back to the env var. Better Auth
 // validates baseURL with new URL() so we always need an absolute URL.
-const baseURL =
-  typeof window !== "undefined"
-    ? `${window.location.origin}/dwello`
-    : process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000/dwello";
+//
+// globalThis cast avoids needing DOM in @kan/auth's tsconfig lib.
+const browserOrigin = (
+  globalThis as { location?: { origin: string } }
+).location?.origin;
+const baseURL = browserOrigin
+  ? `${browserOrigin}/dwello`
+  : process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000/dwello";
 
 export const authClient = createAuthClient({
   baseURL,
