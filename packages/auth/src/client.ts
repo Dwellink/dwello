@@ -29,13 +29,20 @@ const socialProvidersPluginClient = {
 // Kan is mounted at /dwello behind Dwellink's proxy. Fetches from the
 // browser are origin-absolute, so without this prefix authClient would
 // call /api/auth/* (Dwellink's own NextAuth handler) instead of
-// /dwello/api/auth/* (Kan's own handler). Better Auth's client validates
-// baseURL with new URL(), which requires an absolute URL — so this has
-// to be read from the build-time env and include the /dwello path.
-// Set NEXT_PUBLIC_BASE_URL=https://dwellink.co/dwello (prod) or
-// http://localhost:3000/dwello (dev) in Vercel / .env.
+// /dwello/api/auth/* (Kan's own handler).
+//
+// In the browser, derive baseURL from the current origin so the request
+// stays same-host as the page — critical because Dwellink's session
+// cookie is host-only (no Domain= attribute), so a fetch to a different
+// host (e.g. dwellink.co vs. www.dwellink.co) drops the cookie and the
+// middleware bounces the request to /auth/signin.
+//
+// On the server (SSR / build), fall back to the env var. Better Auth
+// validates baseURL with new URL() so we always need an absolute URL.
 const baseURL =
-  process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000/dwello";
+  typeof window !== "undefined"
+    ? `${window.location.origin}/dwello`
+    : process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000/dwello";
 
 export const authClient = createAuthClient({
   baseURL,
