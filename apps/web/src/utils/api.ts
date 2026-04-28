@@ -37,10 +37,13 @@ const authLink: TRPCLink<AppRouter> = () => {
   };
 };
 
+// Kan is mounted at basePath /dwello — every URL the tRPC client emits has to include
+// that prefix or it lands on Dwellink's domain (404). Same fix shape as authClient.ts.
 const getBaseUrl = () => {
-  if (typeof window !== "undefined") return ""; // browser should use relative url
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
-  return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
+  const basePath = "/dwello";
+  if (typeof window !== "undefined") return basePath;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}${basePath}`;
+  return `http://localhost:${process.env.PORT ?? 3000}${basePath}`;
 };
 
 const queryClient = new QueryClient();
