@@ -3,11 +3,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { env } from "next-runtime-env";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { authClient } from "@kan/auth/client";
 
 import { Auth } from "~/components/AuthForm";
+import LoadingSpinner from "~/components/LoadingSpinner";
 import { PageHead } from "~/components/PageHead";
 import PatternedBackground from "~/components/PatternedBackground";
 
@@ -24,9 +25,12 @@ export default function LoginPage() {
     setMagicLinkRecipient(recipient);
   };
 
-  const { data } = authClient.useSession();
+  const { data, isPending } = authClient.useSession();
+  const isAuthed = !!data?.user?.id;
 
-  if (data?.user?.id) router.push("/boards");
+  useEffect(() => {
+    if (isAuthed) router.push("/boards");
+  }, [isAuthed, router]);
 
   return (
     <>
@@ -39,38 +43,46 @@ export default function LoginPage() {
                 kan.bn
               </h1>
             </Link>
-            <p className="mb-10 text-3xl font-bold tracking-tight text-light-1000 dark:text-dark-1000">
-              {isMagicLinkSent ? t`Check your inbox` : t`Welcome back`}
-            </p>
-            {isMagicLinkSent ? (
-              <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                <p className="text-md mt-2 text-center text-light-1000 dark:text-dark-1000">
-                  <Trans>
-                    Click on the link we've sent to {magicLinkRecipient} to sign
-                    in.
-                  </Trans>
-                </p>
+            {isPending || isAuthed ? (
+              <div className="mt-10 flex items-center text-light-1000 dark:text-dark-1000">
+                <LoadingSpinner size="lg" />
               </div>
             ) : (
-              <div className="w-full rounded-lg border border-light-500 bg-light-300 px-4 py-10 dark:border-dark-400 dark:bg-dark-200 sm:max-w-md lg:px-10">
-                <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                  <Auth setIsMagicLinkSent={handleMagicLinkSent} />
-                </div>
-              </div>
-            )}
-            {(!isSignUpDisabled || redirect?.startsWith("/invite/")) && (
-              <p className="mt-4 text-sm text-light-1000 dark:text-dark-1000">
-                <Trans>
-                  Don't have an account?{" "}
-                  <span className="underline">
-                    <Link
-                      href={redirect ? `/signup?next=${redirect}` : "/signup"}
-                    >
-                      Sign up
-                    </Link>
-                  </span>
-                </Trans>
-              </p>
+              <>
+                <p className="mb-10 text-3xl font-bold tracking-tight text-light-1000 dark:text-dark-1000">
+                  {isMagicLinkSent ? t`Check your inbox` : t`Welcome back`}
+                </p>
+                {isMagicLinkSent ? (
+                  <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+                    <p className="text-md mt-2 text-center text-light-1000 dark:text-dark-1000">
+                      <Trans>
+                        Click on the link we've sent to {magicLinkRecipient} to
+                        sign in.
+                      </Trans>
+                    </p>
+                  </div>
+                ) : (
+                  <div className="w-full rounded-lg border border-light-500 bg-light-300 px-4 py-10 dark:border-dark-400 dark:bg-dark-200 sm:max-w-md lg:px-10">
+                    <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+                      <Auth setIsMagicLinkSent={handleMagicLinkSent} />
+                    </div>
+                  </div>
+                )}
+                {(!isSignUpDisabled || redirect?.startsWith("/invite/")) && (
+                  <p className="mt-4 text-sm text-light-1000 dark:text-dark-1000">
+                    <Trans>
+                      Don't have an account?{" "}
+                      <span className="underline">
+                        <Link
+                          href={redirect ? `/signup?next=${redirect}` : "/signup"}
+                        >
+                          Sign up
+                        </Link>
+                      </span>
+                    </Trans>
+                  </p>
+                )}
+              </>
             )}
           </div>
           <PatternedBackground />
