@@ -80,7 +80,8 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
           data-website-id={env("NEXT_PUBLIC_UMAMI_ID")}
         />
       )}
-      <script src="/__ENV.js" />
+      {/* next-runtime-env's default <script src="/__ENV.js"> ignores Next basePath; force /dwello prefix so env() actually works. */}
+      <script src="/dwello/__ENV.js" />
       <main className="font-sans">
         <KeyboardShortcutProvider>
           <LinguiProviderWrapper>
