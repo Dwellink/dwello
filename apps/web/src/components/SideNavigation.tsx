@@ -25,6 +25,7 @@ import settingsIconLight from "~/assets/settings-light.json";
 import templatesIconDark from "~/assets/templates-dark.json";
 import templatesIconLight from "~/assets/templates-light.json";
 import ButtonComponent from "~/components/Button";
+import DwelloLogo from "~/components/DwelloLogo";
 import ReactiveButton from "~/components/ReactiveButton";
 import UserMenu from "~/components/UserMenu";
 import WorkspaceMenu from "~/components/WorkspaceMenu";
@@ -160,9 +161,13 @@ export default function SideNavigation({
         <div>
           <div className="hidden h-[45px] items-center justify-between pb-3 md:flex">
             {!isCollapsed && (
-              <Link href="/" className="block">
-                <h1 className="pl-2 text-[16px] font-bold tracking-tight text-neutral-900 dark:text-dark-1000">
-                  kan.bn
+              <Link
+                href="/"
+                className="flex items-center gap-2 pl-2 text-neutral-900 dark:text-dark-1000"
+              >
+                <DwelloLogo size={20} />
+                <h1 className="text-[16px] font-bold tracking-tight">
+                  dwello
                 </h1>
               </Link>
             )}

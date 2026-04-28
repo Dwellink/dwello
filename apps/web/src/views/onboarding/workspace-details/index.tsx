@@ -209,7 +209,7 @@ export default function WorkspaceNameView() {
                       );
                     }}
                     disabled={!isProToggle}
-                    prefix="kan.bn/"
+                    prefix="dwello/"
                     className={
                       !isProToggle ? "cursor-not-allowed opacity-50" : ""
                     }
