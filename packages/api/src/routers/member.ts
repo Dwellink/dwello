@@ -141,27 +141,17 @@ export const memberRouter = createTRPCRouter({
           code: "INTERNAL_SERVER_ERROR",
         });
 
-      const { status } = await ctx.auth.api.signInMagicLink({
-        email: input.email,
-        callbackURL: `/boards?type=invite&memberPublicId=${invite.publicId}`,
-      });
-
-      if (!status) {
-        console.error("Failed to send magic link invitation:", {
+      // Best-effort send: bridged-auth deployments accept invites at session-creation, so a failed magic-link must not soft-delete the row.
+      try {
+        const { status } = await ctx.auth.api.signInMagicLink({
           email: input.email,
           callbackURL: `/boards?type=invite&memberPublicId=${invite.publicId}`,
         });
-
-        await memberRepo.softDelete(ctx.db, {
-          memberId: invite.id,
-          deletedAt: new Date(),
-          deletedBy: userId,
-        });
-
-        throw new TRPCError({
-          message: `Failed to send magic link invitation to user with email ${input.email}.`,
-          code: "INTERNAL_SERVER_ERROR",
-        });
+        if (!status) {
+          console.warn("Magic link not sent (status=false):", input.email);
+        }
+      } catch (err) {
+        console.warn("Magic link send threw, leaving invite intact:", err);
       }
 
       return invite;

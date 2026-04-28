@@ -1,7 +1,8 @@
 import { createHash } from "crypto";
+import { and, eq, isNull } from "drizzle-orm";
 
 import type { dbClient } from "@kan/db/client";
-import { users } from "@kan/db/schema";
+import { users, workspaceMembers } from "@kan/db/schema";
 
 const MAX_SKEW_MS = 60_000;
 
@@ -189,6 +190,23 @@ export async function getSessionFromBridgeHeaders(
       lastFailure = { reason: "upsert-failed", details: { kanUserId } };
       return null;
     }
+
+    // Reconcile pending invites — bridged users never trigger Better Auth's magic-link accept-flow, so link userId here. Best-effort.
+    try {
+      await db
+        .update(workspaceMembers)
+        .set({ status: "active", userId: row.id })
+        .where(
+          and(
+            eq(workspaceMembers.email, email),
+            eq(workspaceMembers.status, "invited"),
+            isNull(workspaceMembers.deletedAt),
+          ),
+        );
+    } catch (err) {
+      console.error("dwellink bridge: invite reconciliation failed", err);
+    }
+
     lastFailure = null;
 
     return {
