@@ -66,7 +66,7 @@ export const boards = pgTable(
       .on(table.workspaceId, table.slug)
       .where(sql`${table.deletedAt} IS NULL`),
   ],
-).enableRLS();
+);
 
 export const boardsRelations = relations(boards, ({ one, many }) => ({
   userFavorites: many(userBoardFavorites),

@@ -20,7 +20,7 @@ export const feedback = pgTable("feedback", {
   updatedAt: timestamp("updatedAt"),
   url: text("url").notNull(),
   reviewed: boolean("reviewed").default(false).notNull(),
-}).enableRLS();
+});
 
 export const feedbackRelations = relations(feedback, ({ one }) => ({
   createdBy: one(users, {

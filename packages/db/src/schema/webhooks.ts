@@ -40,7 +40,7 @@ export const workspaceWebhooks = pgTable("workspace_webhooks", {
   updatedAt: timestamp("updatedAt"),
 }, (table) => [
   index("workspace_webhooks_workspace_idx").on(table.workspaceId),
-]).enableRLS();
+]);
 
 export const workspaceWebhooksRelations = relations(
   workspaceWebhooks,

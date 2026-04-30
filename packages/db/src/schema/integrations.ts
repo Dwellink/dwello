@@ -31,7 +31,7 @@ export const integrations = pgTable(
       columns: [table.userId, table.provider],
     }),
   ],
-).enableRLS();
+);
 
 export const integrationsRelations = relations(integrations, ({ one }) => ({
   user: one(users, {

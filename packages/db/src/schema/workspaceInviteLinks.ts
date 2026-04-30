@@ -34,4 +34,4 @@ export const workspaceInviteLinks = pgTable("workspace_invite_links", {
   updatedBy: uuid("updatedBy").references(() => users.id, {
     onDelete: "set null",
   }),
-}).enableRLS();
+});

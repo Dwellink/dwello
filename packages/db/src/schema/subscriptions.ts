@@ -29,7 +29,7 @@ export const subscription = pgTable("subscription", {
   trialEnd: timestamp("trialEnd"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-}).enableRLS();
+});
 
 export const subscriptionsRelations = relations(subscription, ({ one }) => ({
   workspace: one(workspaces, {

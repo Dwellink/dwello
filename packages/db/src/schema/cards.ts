@@ -73,7 +73,7 @@ export const cards = pgTable("card", {
     .references(() => lists.id, { onDelete: "cascade" }),
   importId: bigint("importId", { mode: "number" }).references(() => imports.id),
   dueDate: timestamp("dueDate"),
-}).enableRLS();
+});
 
 export const cardsRelations = relations(cards, ({ one, many }) => ({
   createdBy: one(users, {
@@ -150,7 +150,7 @@ export const cardActivities = pgTable("card_activity", {
     () => cardAttachments.id,
     { onDelete: "cascade" },
   ),
-}).enableRLS();
+});
 
 export const cardActivitiesRelations = relations(cardActivities, ({ one }) => ({
   card: one(cards, {
@@ -211,7 +211,7 @@ export const cardsToLabels = pgTable(
       .references(() => labels.id, { onDelete: "cascade" }),
   },
   (t) => [primaryKey({ columns: [t.cardId, t.labelId] })],
-).enableRLS();
+);
 
 export const cardToLabelsRelations = relations(cardsToLabels, ({ one }) => ({
   card: one(cards, {
@@ -237,7 +237,7 @@ export const cardToWorkspaceMembers = pgTable(
       .references(() => workspaceMembers.id, { onDelete: "cascade" }),
   },
   (t) => [primaryKey({ columns: [t.cardId, t.workspaceMemberId] })],
-).enableRLS();
+);
 
 export const cardToWorkspaceMembersRelations = relations(
   cardToWorkspaceMembers,
@@ -271,7 +271,7 @@ export const comments = pgTable("card_comments", {
   deletedBy: uuid("deletedBy").references(() => users.id, {
     onDelete: "set null",
   }),
-}).enableRLS();
+});
 
 export const commentsRelations = relations(comments, ({ one }) => ({
   card: one(cards, {
@@ -307,7 +307,7 @@ export const cardAttachments = pgTable("card_attachment", {
   }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   deletedAt: timestamp("deletedAt"),
-}).enableRLS();
+});
 
 export const cardAttachmentsRelations = relations(
   cardAttachments,

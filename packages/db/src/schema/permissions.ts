@@ -32,7 +32,7 @@ export const workspaceRoles = pgTable(
     uniqueIndex("unique_role_per_workspace").on(table.workspaceId, table.name),
     index("workspace_roles_workspace_idx").on(table.workspaceId),
   ],
-).enableRLS();
+);
 
 export const workspaceRolesRelations = relations(
   workspaceRoles,
@@ -65,7 +65,7 @@ export const workspaceRolePermissions = pgTable(
     ),
     index("role_permissions_role_idx").on(table.workspaceRoleId),
   ],
-).enableRLS();
+);
 
 export const workspaceRolePermissionsRelations = relations(
   workspaceRolePermissions,
@@ -95,4 +95,4 @@ export const workspaceMemberPermissions = pgTable(
     ),
     index("permission_member_idx").on(table.workspaceMemberId),
   ],
-).enableRLS();
+);
