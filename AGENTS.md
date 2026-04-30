@@ -331,3 +331,10 @@ Update all of the following:
 - Provide clear description of changes
 - Include screenshots for UI changes
 - Keep PRs focused on a single feature/fix
+
+## Pending Decisions / Tech Debt
+
+These came out of the 2026-04-29 audit triggered by the `card.create` 500 incident (commit `9c213fd`). Each needs design input before being implemented.
+
+- **RLS posture on Kan tables.** Every schema file calls `.enableRLS()` but no policies are defined; works today only because the connecting role bypasses RLS. Pick one: (a) add policies mirroring `assertPermission` (`packages/api/src/utils/permissions.ts`), or (b) call `.disableRLS()` and rely on app-layer tenancy. Don't leave the half-state.
+- **Migration / runtime schema drift.** Migration files in `packages/db/migrations/` reference `"public"."x"` and unqualified table names, but runtime tables actually live in the `kan` schema (per `pgSchema('kan')` in `packages/db/src/schema/_table.ts`, commit `000bf0d`). Prod was reconciled out-of-band. A fresh `drizzle-kit migrate` against an empty DB lands tables in `public`, breaking runtime. Fix is a `pg_dump --schema-only --schema=kan` from prod followed by a consolidated baseline migration.
