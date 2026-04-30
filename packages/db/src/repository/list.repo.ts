@@ -72,10 +72,10 @@ export const create = async (
       await tx.execute(sql`
         WITH ordered AS (
           SELECT id, ROW_NUMBER() OVER (ORDER BY "index", id) - 1 AS new_index
-          FROM "list"
+          FROM ${lists}
           WHERE "boardId" = ${result.boardId} AND "deletedAt" IS NULL
         )
-        UPDATE "list" l
+        UPDATE ${lists} l
         SET "index" = o.new_index
         FROM ordered o
         WHERE l.id = o.id;
@@ -176,10 +176,10 @@ export const bulkCreate = async (
         await tx.execute(sql`
           WITH ordered AS (
             SELECT id, ROW_NUMBER() OVER (ORDER BY "index", id) - 1 AS new_index
-            FROM "list"
+            FROM ${lists}
             WHERE "boardId" = ${boardId} AND "deletedAt" IS NULL
           )
-          UPDATE "list" l
+          UPDATE ${lists} l
           SET "index" = o.new_index
           FROM ordered o
           WHERE l.id = o.id;
@@ -281,7 +281,7 @@ export const reorder = async (
       throw new Error(`List not found for public ID ${args.listPublicId}`);
 
     await tx.execute(sql`
-      UPDATE list
+      UPDATE ${lists}
       SET index =
         CASE
           WHEN index = ${list.index} AND id = ${list.id} THEN ${args.newIndex}
@@ -309,10 +309,10 @@ export const reorder = async (
       await tx.execute(sql`
         WITH ordered AS (
           SELECT id, ROW_NUMBER() OVER (ORDER BY "index", id) - 1 AS new_index
-          FROM "list"
+          FROM ${lists}
           WHERE "boardId" = ${list.boardId} AND "deletedAt" IS NULL
         )
-        UPDATE "list" l
+        UPDATE ${lists} l
         SET "index" = o.new_index
         FROM ordered o
         WHERE l.id = o.id;
@@ -387,7 +387,7 @@ export const softDeleteById = async (
       throw new Error(`Unable to soft delete list ID ${args.listId}`);
 
     await tx.execute(sql`
-      UPDATE list
+      UPDATE ${lists}
       SET index = index - 1
       WHERE "boardId" = ${result.boardId} AND index > ${result.index} AND "deletedAt" IS NULL;
     `);

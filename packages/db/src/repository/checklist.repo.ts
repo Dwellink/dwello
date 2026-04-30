@@ -407,7 +407,7 @@ export const reorderItem = async (
 
     if (currentIndex < newIndex) {
       await tx.execute(sql`
-        UPDATE card_checklist_item
+        UPDATE ${checklistItems}
         SET index = index - 1
         WHERE "checklistId" = ${item.checklistId}
         AND index > ${currentIndex}
@@ -416,7 +416,7 @@ export const reorderItem = async (
         `);
     } else {
       await tx.execute(sql`
-        UPDATE card_checklist_item
+        UPDATE ${checklistItems}
         SET index = index + 1
         WHERE "checklistId" = ${item.checklistId}
         AND index >= ${newIndex}

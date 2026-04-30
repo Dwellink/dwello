@@ -33,13 +33,14 @@ export const createDrizzleClient = (): dbClient => {
     return db as unknown as dbClient;
   }
 
-  // Isolate Kan's tables in the "kan" Postgres schema so this deployment
-  // can share a database with the host app (Dwellink) without colliding
-  // on table names like "user", "session", etc. Drizzle's generated SQL
-  // stays unqualified — search_path resolves it to kan.* at runtime, and
-  // drizzle-kit writes CREATE TABLE into kan.* via the same search_path.
-  // Passed as a libpq startup option so it applies before the first query
-  // (no race vs. a Pool "connect" listener).
+  // Kan's tables live in the "kan" Postgres schema (via pgSchema('kan') in
+  // src/schema/_table.ts) so this deployment can share a database with the
+  // host app (Dwellink) without colliding on names like "user", "session".
+  // Drizzle ORM emits schema-qualified SQL ("kan"."card", …); raw sql`…`
+  // blocks in repo files interpolate Drizzle table identifiers (${cards})
+  // for the same reason. The search_path option below is belt-and-suspenders
+  // for any future raw SQL that might slip through unqualified — it's not
+  // load-bearing, since some poolers strip libpq startup options.
   const pool = new Pool({
     connectionString,
     options: "-c search_path=kan,public",

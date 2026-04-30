@@ -76,7 +76,7 @@ export const create = async (
 
     if (existingCardAtIndex?.id) {
       await tx.execute(sql`
-        UPDATE card
+        UPDATE ${cards}
         SET index = index + 1
         WHERE "listId" = ${cardInput.listId} AND index >= ${index} AND "deletedAt" IS NULL;
       `);
@@ -121,10 +121,10 @@ export const create = async (
       await tx.execute(sql`
         WITH ordered AS (
           SELECT id, ROW_NUMBER() OVER (ORDER BY "index", id) - 1 AS new_index
-          FROM "card"
+          FROM ${cards}
           WHERE "listId" = ${result[0].listId} AND "deletedAt" IS NULL
         )
-        UPDATE "card" c
+        UPDATE ${cards} c
         SET "index" = o.new_index
         FROM ordered o
         WHERE c.id = o.id;
@@ -340,10 +340,10 @@ export const bulkCreate = async (
         await tx.execute(sql`
           WITH ordered AS (
             SELECT id, ROW_NUMBER() OVER (ORDER BY "index", id) - 1 AS new_index
-            FROM "card"
+            FROM ${cards}
             WHERE "listId" = ${listId} AND "deletedAt" IS NULL
           )
-          UPDATE "card" c
+          UPDATE ${cards} c
           SET "index" = o.new_index
           FROM ordered o
           WHERE c.id = o.id;
@@ -714,7 +714,7 @@ export const reorder = async (
 
     if (currentList.id === newList?.id) {
       await tx.execute(sql`
-        UPDATE card
+        UPDATE ${cards}
         SET index =
           CASE
             WHEN index = ${currentIndex} THEN ${newIndex}
@@ -726,19 +726,19 @@ export const reorder = async (
       `);
     } else {
       await tx.execute(sql`
-        UPDATE card
+        UPDATE ${cards}
         SET index = index + 1
         WHERE "listId" = ${newList?.id} AND index >= ${newIndex} AND "deletedAt" IS NULL;
       `);
 
       await tx.execute(sql`
-        UPDATE card
+        UPDATE ${cards}
         SET index = index - 1
         WHERE "listId" = ${currentList.id} AND index >= ${currentIndex} AND "deletedAt" IS NULL;
       `);
 
       await tx.execute(sql`
-        UPDATE card
+        UPDATE ${cards}
         SET "listId" = ${newList?.id}, index = ${newIndex}
         WHERE id = ${card.id} AND "deletedAt" IS NULL;
       `);
@@ -774,10 +774,10 @@ export const reorder = async (
         await tx.execute(sql`
           WITH ordered AS (
             SELECT id, ROW_NUMBER() OVER (ORDER BY "index", id) - 1 AS new_index
-            FROM "card"
+            FROM ${cards}
             WHERE "listId" = ${affectedListIds[0]} AND "deletedAt" IS NULL
           )
-          UPDATE "card" c
+          UPDATE ${cards} c
           SET "index" = o.new_index
           FROM ordered o
           WHERE c.id = o.id;
@@ -787,10 +787,10 @@ export const reorder = async (
           WITH ordered AS (
             SELECT id,
                    ROW_NUMBER() OVER (PARTITION BY "listId" ORDER BY "index", id) - 1 AS new_index
-            FROM "card"
+            FROM ${cards}
             WHERE "listId" IN (${sql.join(affectedListIds, sql`,`)}) AND "deletedAt" IS NULL
           )
-          UPDATE "card" c
+          UPDATE ${cards} c
           SET "index" = o.new_index
           FROM ordered o
           WHERE c.id = o.id;
@@ -852,7 +852,7 @@ export const softDelete = async (
       throw new Error(`Unable to soft delete card ID ${args.cardId}`);
 
     await tx.execute(sql`
-      UPDATE card
+      UPDATE ${cards}
       SET index = index - 1
       WHERE "listId" = ${result.listId} AND index > ${result.index} AND "deletedAt" IS NULL;
     `);
