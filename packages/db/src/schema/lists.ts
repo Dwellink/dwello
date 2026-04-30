@@ -32,7 +32,7 @@ export const lists = pgTable("list", {
     .notNull()
     .references(() => boards.id, { onDelete: "cascade" }),
   importId: bigint("importId", { mode: "number" }).references(() => imports.id),
-}).enableRLS();
+});
 
 export const listsRelations = relations(lists, ({ one, many }) => ({
   createdBy: one(users, {

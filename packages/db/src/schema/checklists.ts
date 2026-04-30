@@ -30,7 +30,7 @@ export const checklists = pgTable("card_checklist", {
   deletedBy: uuid("deletedBy").references(() => users.id, {
     onDelete: "set null",
   }),
-}).enableRLS();
+});
 
 export const checklistsRelations = relations(checklists, ({ one, many }) => ({
   card: one(cards, {
@@ -69,7 +69,7 @@ export const checklistItems = pgTable("card_checklist_item", {
   deletedBy: uuid("deletedBy").references(() => users.id, {
     onDelete: "set null",
   }),
-}).enableRLS();
+});
 
 export const checklistItemsRelations = relations(checklistItems, ({ one }) => ({
   checklist: one(checklists, {
