@@ -22,7 +22,7 @@ export const session = pgTable("session", {
   userId: uuid("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-}).enableRLS();
+});
 
 export const account = pgTable("account", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
@@ -40,7 +40,7 @@ export const account = pgTable("account", {
   password: text("password"),
   createdAt: timestamp("createdAt").notNull(),
   updatedAt: timestamp("updatedAt").notNull(),
-}).enableRLS();
+});
 
 export const verification = pgTable("verification", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
@@ -49,7 +49,7 @@ export const verification = pgTable("verification", {
   expiresAt: timestamp("expiresAt").notNull(),
   createdAt: timestamp("createdAt"),
   updatedAt: timestamp("updatedAt"),
-}).enableRLS();
+});
 
 export const apikey = pgTable("apiKey", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
@@ -75,7 +75,7 @@ export const apikey = pgTable("apiKey", {
   updatedAt: timestamp("updatedAt").notNull(),
   permissions: text("permissions"),
   metadata: text("metadata"),
-}).enableRLS();
+});
 
 export const apiKeyRelations = relations(apikey, ({ one }) => ({
   user: one(users, {

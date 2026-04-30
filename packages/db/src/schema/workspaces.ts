@@ -55,7 +55,7 @@ export const workspaces = pgTable("workspace", {
   deletedBy: uuid("deletedBy").references(() => users.id, {
     onDelete: "set null",
   }),
-}).enableRLS();
+});
 
 export const workspaceRelations = relations(workspaces, ({ one, many }) => ({
   user: one(users, {
@@ -96,7 +96,7 @@ export const workspaceMembers = pgTable("workspace_members", {
     { onDelete: "restrict" },
   ),
   status: memberStatusEnum("status").default("invited").notNull(),
-}).enableRLS();
+});
 
 export const workspaceMembersRelations = relations(
   workspaceMembers,
@@ -148,4 +148,4 @@ export const slugChecks = pgTable("workspace_slug_checks", {
     onDelete: "set null",
   }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-}).enableRLS();
+});

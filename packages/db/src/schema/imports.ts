@@ -29,7 +29,7 @@ export const imports = pgTable("import", {
     onDelete: "set null",
   }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-}).enableRLS();
+});
 
 export const importsRelations = relations(imports, ({ one, many }) => ({
   createdBy: one(users, {

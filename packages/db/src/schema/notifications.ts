@@ -70,7 +70,7 @@ export const notifications = pgTable(
     ),
     index("notification_user_created_idx").on(table.userId, table.createdAt),
   ],
-).enableRLS();
+);
 
 export const notificationsRelations = relations(notifications, ({ one }) => ({
   user: one(users, {

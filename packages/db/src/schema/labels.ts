@@ -31,7 +31,7 @@ export const labels = pgTable("label", {
   deletedBy: uuid("deletedBy").references(() => users.id, {
     onDelete: "set null",
   }),
-}).enableRLS();
+});
 
 export const labelsRelations = relations(labels, ({ one, many }) => ({
   createdBy: one(users, {
