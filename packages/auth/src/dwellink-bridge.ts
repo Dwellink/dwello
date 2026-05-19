@@ -166,25 +166,43 @@ export async function getSessionFromBridgeHeaders(
   const now = new Date();
 
   try {
-    const [row] = await db
-      .insert(users)
-      .values({
-        id: kanUserId,
-        email,
-        name: name || null,
-        emailVerified: true,
-        createdAt: now,
-        updatedAt: now,
-      })
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
+    // Email is the natural identity here, not the derived UUID. A pre-existing
+    // Better-Auth row for this email (from before the bridge was wired up)
+    // collides on user_email_unique if we insert keyed by kanUserId. Adopt the
+    // existing row's id instead — keeps foreign-key references (workspaces,
+    // cards, comments, etc.) stable across the migration.
+    const [existing] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+
+    let row;
+    if (existing) {
+      const updated = await db
+        .update(users)
+        .set({
+          name: name || existing.name,
+          emailVerified: true,
+          updatedAt: now,
+        })
+        .where(eq(users.id, existing.id))
+        .returning();
+      row = updated[0];
+    } else {
+      const inserted = await db
+        .insert(users)
+        .values({
+          id: kanUserId,
           email,
           name: name || null,
+          emailVerified: true,
+          createdAt: now,
           updatedAt: now,
-        },
-      })
-      .returning();
+        })
+        .returning();
+      row = inserted[0];
+    }
 
     if (!row) {
       lastFailure = { reason: "upsert-failed", details: { kanUserId } };
